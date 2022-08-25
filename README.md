@@ -35,35 +35,87 @@ ___
 
 ## Как запустить проект:
 
-- Клонировать репозиторий и перейти в него в командной строке:
-```
-git clone https://github.com/26remph/api_yamdb.git
-cd api_yamdb
-``` 
+Установка
 
-- Cоздать и активировать виртуальное окружение:
-```
-python3 -m venv env
-source env/bin/activate
-```
+- Шаг 1. Проверьте установлен ли у вас Docker
+Прежде, чем приступать к работе, необходимо знать, что Docker установлен. Для этого достаточно ввести:
 
-- Установить зависимости из файла requirements.txt:
 ```
-python3 -m pip install --upgrade pip
-pip install -r requirements.txt
+docker -v
 ```
+Или скачайте Docker Desktop для Mac или Windows. Docker Compose будет установлен автоматически. В Linux убедитесь, что у вас установлена последняя версия Compose. Также вы можете воспользоваться официальной инструкцией.
 
-- Выполнить миграции:
+- Шаг 2. Клонируйте репозиторий себе на компьютер
+Введите команду:
+
 ```
-python3 manage.py migrate
+git clone https://github.com/viplod/infra_sp2.git
 ```
 
-- Запустить проект:
+- Шаг 3. Создайте в клонированной директории файл .env
+Пример:
 ```
-python3 manage.py runserver
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
 ```
+
+- Шаг 4. Запуск docker-compose
+Для запуска необходимо выполнить из директории с проектом команду:
+```
+docker-compose up -d
+```
+
+- Шаг 5. База данных
+Создаем и применяем миграции:
+```
+docker-compose exec web python manage.py makemigrations --noinput
+docker-compose exec web python manage.py migrate --noinput
+```
+
+- Шаг 6. Подгружаем статику
+Выполните команду:
+```
+docker-compose exec web python manage.py collectstatic --no-input 
+```
+
+- Шаг 7. Заполнение базы тестовыми данными
+Для заполнения базы тестовыми данными вы можете использовать файл fixtures.json, который находится в infra_sp2. Выполните команду:
+```
+docker-compose exec web python manage.py loaddata fixtures.json
+```
+
+Другие команды
+Создание суперпользователя:
+```
+docker-compose exec web python manage.py createsuperuser
+```
+
+Остановить работу всех контейнеров можно командой:
+```
+docker-compose down
+```
+
+Для пересборки и запуска контейнеров воспользуйтесь командой:
+```
+docker-compose up -d --build
+```
+
+Мониторинг запущенных контейнеров:
+```
+docker stats
+```
+
+Останавливаем и удаляем контейнеры, сети, тома и образы:
+```
+docker-compose down -v
+```
+
 Ознакомиться с документацией по адресу.
-[http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/)
+[http://127.0.0.1/redoc/](http://127.0.0.1/redoc/)
 
 
 ## Документация по api
@@ -77,7 +129,7 @@ python3 manage.py runserver
 }
 POST-запрос на эндпоинт:
 ```
-http://127.0.0.1:8000/api/v1/auth/signup/
+http://127.0.0.1/api/v1/auth/signup/
 ```
 
 
@@ -91,7 +143,7 @@ http://127.0.0.1:8000/api/v1/auth/signup/
 }
 POST-запрос на эндпоинт:
 ```
-http://127.0.0.1:8000/api/v1/auth/token/
+http://127.0.0.1/api/v1/auth/token/
 ```
 Токен использовать для авторизации
 
