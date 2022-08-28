@@ -10,4 +10,8 @@ COPY . /app
 
 WORKDIR /app
 
-CMD ["gunicorn", "api_yamdb.wsgi:application", "--bind", "0:8000"]
+RUN python manage.py collectstatic --noinput
+
+COPY docker-entrypoint.sh /app
+
+ENTRYPOINT ["sh", "docker-entrypoint.sh"]
